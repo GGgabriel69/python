@@ -1,33 +1,36 @@
-from flask import Flask, request, jsonify
+ffrom flask import Flask, render_template, request, jsonify
+
+#GPIO
 import RPi.GPIO as GPIO
-
-#configurer le GPIO
+GPIO_PIN_LED = 27
+GPIO_PIN_BUTTON = 17
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(17, GPIO.OUT)
-GPIO.setup(27, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(GPIO_PIN_LED, GPIO.OUT)
+GPIO.setup(GPIO_PIN_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
 
-app = Flask(__name__, static_folder='static')
+#Flask
+app = Flask(__name__)
 
-@app.route('/button_state', methods=['GET'])
-def button_state():
-    state = GPIO.input(27)  #lire l'état du bouton
-    return jsonify({"button_pressed":bool(state)}), 200
+#Flask page d'accueil
+@app.route('/')
+def index():
+    return render_template('index.html')
+ 
+ #Flask allumer eteindre DEL
+@app.route('/del', methods=['POST'])
+def allumer_eteindre_del():
+        isLed1On = request.json['isLed1On']
+        if isLed1On:
+            GPIO.output(GPIO_PIN_LED, GPIO.HIGH)
+        else:
+            GPIO.output(GPIO_PIN_LED, GPIO.LOW)
+        return jsonify({'message': 'LED state updated successfully'})
 
-@app.route('/led_on', methods=['POST'])
-def led_on():
-    data = request.get_json()
-    if data['state'] == 'on':
-        GPIO.output(17, GPIO.HIGH)  #allume led
-    else: 
-        GPIO.output(17, GPIO.LOW)  #allume led
-    return "état changé"
-
-
-    #test 1
-
+#Flask lire bouton
+@app.route('/bouton', methods=['GET'])
+def lire_bouton():
+    isButton1On = True if GPIO.input(GPIO_PIN_BUTTON) else False
+    return jsonify({'isButton1On': isButton1On})
 
 if __name__ == '__main__':
-    try:
-       app.run(host='0.0.0.0')
-    except KeyboardInterrupt:
-       GPIO.cleanup()   #nettoyer le GPIo à la fin
+    app.run(host='0.0.0.0')
