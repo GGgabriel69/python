@@ -1,12 +1,16 @@
-ffrom flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify
 
 #GPIO
 import RPi.GPIO as GPIO
-GPIO_PIN_LED = 27
-GPIO_PIN_BUTTON = 17
+GPIO_PIN_DIR_D = 27
+GPIO_PIN_DIR_G= 17
+GPIO_PIN_VIT_D = 22
+GPIO_PIN_VIT_G = 23
 GPIO.setmode(GPIO.BCM)
-GPIO.setup(GPIO_PIN_LED, GPIO.OUT)
-GPIO.setup(GPIO_PIN_BUTTON, GPIO.IN, pull_up_down=GPIO.PUD_UP)
+GPIO.setup(GPIO_PIN_DIR_D, GPIO.OUT)
+GPIO.setup(GPIO_PIN_DIR_G, GPIO.OUT)
+GPIO.setup(GPIO_PIN_VIT_D, GPIO.OUT)
+GPIO.setup(GPIO_PIN_VIT_G, GPIO.OUT)
 
 #Flask
 app = Flask(__name__)
@@ -18,13 +22,31 @@ def index():
  
  #Flask allumer eteindre DEL
 @app.route('/del', methods=['POST'])
-def allumer_eteindre_del():
-        isLed1On = request.json['isLed1On']
-        if isLed1On:
-            GPIO.output(GPIO_PIN_LED, GPIO.HIGH)
+def modif_vitesse_direction():
+        isDirDOn = request.json['isDirDOn']
+        if isDirDOn:
+            GPIO.output(GPIO_PIN_DIR_D, GPIO.HIGH)
         else:
-            GPIO.output(GPIO_PIN_LED, GPIO.LOW)
-        return jsonify({'message': 'LED state updated successfully'})
+            GPIO.output(GPIO_PIN_DIR_D, GPIO.LOW)
+        
+        isDirGOn = request.json['isDirGOn']
+        if isDirGOn:
+            GPIO.output(GPIO_PIN_DIR_G, GPIO.HIGH)
+        else:
+            GPIO.output(GPIO_PIN_DIR_G, GPIO.LOW)
+
+        isVITDOn = request.json['isVITDOn']
+        if isVITDOn:
+            GPIO.output(GPIO_PIN_VIT_D, GPIO.HIGH)
+        else:
+            GPIO.output(GPIO_PIN_VIT_D, GPIO.LOW)
+
+        isVITGOn = request.json['isVITGOn']
+        if isVITGOn:
+            GPIO.output(GPIO_PIN_VIT_G, GPIO.HIGH)
+        else:
+            GPIO.output(GPIO_PIN_VIT_G, GPIO.LOW)
+        return jsonify({'message': 'directions et vitesses updated successfully'})
 
 #Flask lire bouton
 @app.route('/bouton', methods=['GET'])
