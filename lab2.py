@@ -1,4 +1,5 @@
 from flask import Flask, render_template, request, jsonify
+from flask_cors import CORS
 
 #GPIO
 import RPi.GPIO as GPIO
@@ -12,9 +13,10 @@ GPIO.setup(GPIO_PIN_DIR_G, GPIO.OUT)
 GPIO.setup(GPIO_PIN_VIT_D, GPIO.OUT)
 GPIO.setup(GPIO_PIN_VIT_G, GPIO.OUT)
 
+
 #Flask
 app = Flask(__name__)
-
+CORS(app)
 #Flask page d'accueil
 @app.route('/')
 def index():
@@ -35,14 +37,14 @@ def modif_vitesse_direction():
         else:
             GPIO.output(GPIO_PIN_DIR_G, GPIO.LOW)
 
-        isVITDOn = request.json['isVITDOn']
-        if isVITDOn:
+        isVitDOn = request.json['isVitDOn']
+        if isVitDOn:
             GPIO.output(GPIO_PIN_VIT_D, GPIO.HIGH)
         else:
             GPIO.output(GPIO_PIN_VIT_D, GPIO.LOW)
 
-        isVITGOn = request.json['isVITGOn']
-        if isVITGOn:
+        isVitGOn = request.json['isVitGOn']
+        if isVitGOn:
             GPIO.output(GPIO_PIN_VIT_G, GPIO.HIGH)
         else:
             GPIO.output(GPIO_PIN_VIT_G, GPIO.LOW)
