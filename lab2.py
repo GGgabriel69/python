@@ -13,6 +13,13 @@ GPIO.setup(GPIO_PIN_DIR_G, GPIO.OUT)
 GPIO.setup(GPIO_PIN_VIT_D, GPIO.OUT)
 GPIO.setup(GPIO_PIN_VIT_G, GPIO.OUT)
 
+class Moteur:
+    def __init__ (self, isDirDOn, isDirGOn, isVitDOn, isVitGOn):
+        self.isDirDOn = isDirDOn
+        self.isDirGOn = isDirGOn
+        self.isVitDOn = isVitDOn
+        self.isVitGOn = isVitGOn
+
 
 #Flask
 app = Flask(__name__)
@@ -23,32 +30,34 @@ def index():
     return render_template('index.html')
  
  #Flask allumer eteindre DEL
-@app.route('/del', methods=['POST'])
+@app.route('/moteur', methods=['POST'])
 def modif_vitesse_direction():
-        isDirDOn = request.json['isDirDOn']
-        if isDirDOn:
-            GPIO.output(GPIO_PIN_DIR_D, GPIO.HIGH)
-        else:
-            GPIO.output(GPIO_PIN_DIR_D, GPIO.LOW)
+
+    moteur = Moteur(request.json['isDirDOn'],
+                    request.json['isDirGOn'],
+                    request.json['isVitDOn'],
+                    request.json['isVitGOn'],)
         
-        isDirGOn = request.json['isDirGOn']
-        if isDirGOn:
+    if moteur.isDirDOn:
+            GPIO.output(GPIO_PIN_DIR_D, GPIO.HIGH)
+    else:
+            GPIO.output(GPIO_PIN_DIR_D, GPIO.LOW)        
+        
+    if moteur.isDirGOn:
             GPIO.output(GPIO_PIN_DIR_G, GPIO.HIGH)
-        else:
+    else:
             GPIO.output(GPIO_PIN_DIR_G, GPIO.LOW)
-
-        isVitDOn = request.json['isVitDOn']
-        if isVitDOn:
+        
+    if moteur.isVitDOn:
             GPIO.output(GPIO_PIN_VIT_D, GPIO.HIGH)
-        else:
+    else:
             GPIO.output(GPIO_PIN_VIT_D, GPIO.LOW)
-
-        isVitGOn = request.json['isVitGOn']
-        if isVitGOn:
+        
+    if moteur.isVitGOn:
             GPIO.output(GPIO_PIN_VIT_G, GPIO.HIGH)
-        else:
+    else:
             GPIO.output(GPIO_PIN_VIT_G, GPIO.LOW)
-        return jsonify({'message': 'directions et vitesses updated successfully'})
+    return jsonify({'message': 'directions et vitesses updated successfully'})
 
 #Flask lire bouton
 @app.route('/bouton', methods=['GET'])
